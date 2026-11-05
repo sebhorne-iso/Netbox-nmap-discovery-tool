@@ -62,7 +62,7 @@ MAC addresses, IP addresses and **cables built from LLDP/CDP neighbours**. New d
 
 | Component | Supported |
 |-----------|-----------|
-| NetBox | 4.5 – 4.7 (developed and tested against **4.7.4**) |
+| NetBox | 4.5 – 4.7 (tested on **4.5.0**, **4.7.1** and **4.7.4**) |
 | Python | 3.12+ |
 | nmap | 7.80+ on the host or container that runs the NetBox RQ worker |
 | Deployment | [netbox-docker](https://github.com/netbox-community/netbox-docker) (files in [`docker/`](docker/)) or bare metal |
@@ -334,7 +334,7 @@ Integration tests run inside a NetBox checkout with PostgreSQL and Redis availab
 cd /path/to/netbox/netbox && python manage.py test netbox_nmap_discovery
 ```
 
-The [CI workflow](.github/workflows/ci.yml) runs both against NetBox v4.7.4.
+The [CI workflow](.github/workflows/ci.yml) runs both, with the integration tests against NetBox v4.5.0, v4.7.1 and v4.7.4.
 
 ## Limitations
 

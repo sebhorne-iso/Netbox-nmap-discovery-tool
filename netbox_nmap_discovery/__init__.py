@@ -8,7 +8,7 @@ The ``engine`` sub-package has no dependency on NetBox or Django so that it can 
 on its own; the plugin configuration below is therefore only defined when NetBox is importable.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 try:
     from netbox.plugins import PluginConfig

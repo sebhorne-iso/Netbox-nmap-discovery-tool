@@ -26,9 +26,16 @@ jobs:
         run: pytest -q tests/unit
 
   netbox-integration:
+    name: netbox-integration (${{ matrix.netbox-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Oldest supported release (PluginConfig.min_version) up to the latest tested one. Testing the minimum
+        # catches migrations or APIs that only exist in newer NetBox releases.
+        netbox-version: ["v4.5.0", "v4.7.1", "v4.7.4"]
     env:
-      NETBOX_VERSION: v4.7.4
+      NETBOX_VERSION: ${{ matrix.netbox-version }}
     services:
       postgres:
         image: postgres:16
