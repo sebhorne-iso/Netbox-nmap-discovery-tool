@@ -1,0 +1,8 @@
+{"lldp": {"interface": [
+  {"eno1": {"via": "LLDP", "rid": "1", "age": "0 day, 01:00:00",
+    "chassis": {"sw1.example.com": {"id": {"type": "mac", "value": "00:11:22:33:44:00"}, "descr": "Cisco IOS Software", "mgmt-ip": ["10.0.0.1", "fe80::1"]}},
+    "port": {"id": {"type": "ifname", "value": "Gi1/0/5"}, "descr": "GigabitEthernet1/0/5"}}},
+  {"eno2": {"via": "LLDP", "rid": "2",
+    "chassis": {"sw2.example.com": {"id": {"type": "mac", "value": "00:11:22:33:55:00"}, "mgmt-ip": "10.0.0.2"}},
+    "port": {"id": {"type": "mac", "value": "00:11:22:33:55:05"}, "descr": "GigabitEthernet1/0/5"}}}
+]}}

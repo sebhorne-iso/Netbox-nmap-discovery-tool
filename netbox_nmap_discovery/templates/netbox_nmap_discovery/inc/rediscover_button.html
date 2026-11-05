@@ -1,0 +1,4 @@
+{% load i18n %}
+<a href="{% url 'plugins:netbox_nmap_discovery:rediscover' %}?address={{ address }}&return_url={{ request.path|urlencode }}" class="btn btn-cyan" title="{% trans 'Poll this device again with nmap, SNMP and SSH' %}">
+  <i class="mdi mdi-radar" aria-hidden="true"></i> {% trans "Rediscover" %}
+</a>

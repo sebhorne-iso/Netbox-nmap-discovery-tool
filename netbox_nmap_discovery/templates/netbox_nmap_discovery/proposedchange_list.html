@@ -1,0 +1,16 @@
+{% extends 'generic/object_list.html' %}
+{% load i18n %}
+
+{% block bulk_buttons %}
+  <div class="btn-list bulk-action-buttons">
+    {% if perms.netbox_nmap_discovery.change_proposedchange %}
+      <button type="submit" name="_approve" formaction="{% url 'plugins:netbox_nmap_discovery:proposedchange_bulk_approve' %}?return_url={{ request.get_full_path|urlencode }}" class="btn btn-green">
+        <i class="mdi mdi-check-bold" aria-hidden="true"></i> {% trans "Approve selected" %}
+      </button>
+      <button type="submit" name="_reject" formaction="{% url 'plugins:netbox_nmap_discovery:proposedchange_bulk_reject' %}?return_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-danger">
+        <i class="mdi mdi-close-thick" aria-hidden="true"></i> {% trans "Reject selected" %}
+      </button>
+    {% endif %}
+    {{ bulk_actions }}
+  </div>
+{% endblock %}

@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-unit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: pip install ruff pytest -e .
+      - name: Lint
+        run: ruff check netbox_nmap_discovery tests
+      - name: Engine unit tests (no NetBox required)
+        run: pytest -q tests/unit
+
+  netbox-integration:
+    runs-on: ubuntu-latest
+    env:
+      NETBOX_VERSION: v4.7.4
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: netbox
+          POSTGRES_PASSWORD: netbox
+          POSTGRES_DB: netbox
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+      - uses: actions/checkout@v4
+        with:
+          repository: netbox-community/netbox
+          ref: ${{ env.NETBOX_VERSION }}
+          path: netbox
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install NetBox and the plugin
+        run: |
+          pip install -r netbox/requirements.txt
+          pip install -e plugin
+      - name: Configure NetBox
+        run: |
+          cat > netbox/netbox/netbox/configuration.py <<'CONF'
+          ALLOWED_HOSTS = ['*']
+          DATABASES = {'default': {'NAME': 'netbox', 'USER': 'netbox', 'PASSWORD': 'netbox', 'HOST': 'localhost',
+                                   'PORT': '', 'ENGINE': 'django.db.backends.postgresql'}}
+          REDIS = {
+              'tasks': {'HOST': 'localhost', 'PORT': 6379, 'PASSWORD': '', 'DATABASE': 0, 'SSL': False},
+              'caching': {'HOST': 'localhost', 'PORT': 6379, 'PASSWORD': '', 'DATABASE': 1, 'SSL': False},
+          }
+          SECRET_KEY = 'ci-secret-key-0123456789abcdefghijklmnopqrstuvwxyz0123456789'
+          API_TOKEN_PEPPERS = {1: 'ci-pepper-0123456789abcdefghijklmnopqrstuvwxyz0123456789'}
+          PLUGINS = ['netbox_nmap_discovery']
+          PLUGINS_CONFIG = {'netbox_nmap_discovery': {'encryption_key': 'test-encryption-key'}}
+          CONF
+      - name: Check migrations
+        working-directory: netbox/netbox
+        run: python manage.py makemigrations netbox_nmap_discovery --check --dry-run
+      - name: Integration tests
+        working-directory: netbox/netbox
+        run: python manage.py test netbox_nmap_discovery --parallel 1

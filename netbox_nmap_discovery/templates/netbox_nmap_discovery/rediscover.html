@@ -1,0 +1,26 @@
+{% extends 'base/layout.html' %}
+{% load form_helpers %}
+{% load i18n %}
+
+{% block title %}{% trans "Rediscover" %} {{ address }}{% endblock %}
+
+{% block content %}
+<div class="tab-content">
+  <div class="tab-pane show active" role="tabpanel">
+    <form action="{% url 'plugins:netbox_nmap_discovery:rediscover' %}" method="post" class="object-edit mt-5">
+      {% csrf_token %}
+      {% if address and not candidates %}
+        <div class="alert alert-warning">{% trans "No scan target covers this address. Choose one to supply credentials and defaults." %}</div>
+      {% endif %}
+      <div class="field-group my-5">
+        {% render_field form.address %}
+        {% render_field form.scan_target %}
+      </div>
+      <div class="btn-float-group-right">
+        {% if return_url %}<a href="{{ return_url }}" class="btn btn-outline-secondary btn-float">{% trans "Cancel" %}</a>{% endif %}
+        <button type="submit" class="btn btn-primary btn-float"><i class="mdi mdi-refresh" aria-hidden="true"></i> {% trans "Rediscover" %}</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

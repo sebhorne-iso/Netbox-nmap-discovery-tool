@@ -1,0 +1,14 @@
+
+hostname: PA-FW01
+ip-address: 192.168.1.1
+public-ip-address: unknown
+netmask: 255.255.255.0
+default-gateway: 192.168.1.254
+mac-address: 00:1b:17:00:01:10
+time: Mon Nov  4 10:00:00 2024
+uptime: 12 days, 3:04:05
+family: 200
+model: PA-220
+serial: 012801012345
+sw-version: 10.1.6
+app-version: 8500-7000

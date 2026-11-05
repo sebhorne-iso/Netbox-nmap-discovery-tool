@@ -1,0 +1,17 @@
+----------------------------------------
+Device ID:N9K-2(FDO12345678)
+System Name: N9K-2
+
+Interface address(es):
+    IPv4 Address: 10.0.0.3
+Platform: N9K-C93180YC-EX, Capabilities: Router Switch IGMP Filtering Supports-STP-Dispute
+Interface: Ethernet1/49, Port ID (outgoing port): Ethernet1/49
+Holdtime: 170 sec
+
+Version:
+Cisco Nexus Operating System (NX-OS) Software, Version 9.3(8)
+
+Advertisement Version: 2
+
+Mgmt address(es):
+    IPv4 Address: 192.168.0.3

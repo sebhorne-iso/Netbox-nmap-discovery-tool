@@ -1,0 +1,9 @@
+Hostname           : sw-core-01
+System Description : FL.10.10.1020
+System Contact     :
+System Location    : DC1 Row A
+Vendor             : Aruba
+Product Name       : JL658A 6300M 24SFP+ 4SFP56 Swch
+Chassis Serial Nbr : SG0ZKZZ123
+Base MAC Address   : 9020c2-a1b2c3
+AOS-CX Version     : FL.10.10.1020

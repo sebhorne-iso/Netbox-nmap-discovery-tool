@@ -1,0 +1,104 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load plugins %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+
+{% block extra_controls %}
+  {% if can_run %}
+    <form action="{% url 'plugins:netbox_nmap_discovery:scantarget_run' pk=object.pk %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary"{% if not object.enabled %} title="{% trans 'Scan target is disabled' %}"{% endif %}>
+        <i class="mdi mdi-radar" aria-hidden="true"></i> {% trans "Run scan now" %}
+      </button>
+    </form>
+  {% endif %}
+{% endblock extra_controls %}
+
+{% block content %}
+<div class="row mb-3">
+  <div class="col col-12 col-md-6">
+    <div class="card">
+      <h2 class="card-header">{% trans "Scan Target" %}</h2>
+      <table class="table table-hover attr-table">
+        <tr><th scope="row">{% trans "Name" %}</th><td>{{ object.name }}</td></tr>
+        <tr><th scope="row">{% trans "Enabled" %}</th><td>{% checkmark object.enabled %}</td></tr>
+        <tr><th scope="row">{% trans "Targets" %}</th><td class="font-monospace">{{ object.targets|linebreaksbr }}</td></tr>
+        <tr><th scope="row">{% trans "Exclusions" %}</th><td class="font-monospace">{% if object.exclusions %}{{ object.exclusions|linebreaksbr }}{% else %}{{ ''|placeholder }}{% endif %}</td></tr>
+        <tr><th scope="row">{% trans "Description" %}</th><td>{{ object.description|placeholder }}</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2 class="card-header">{% trans "Discovery" %}</h2>
+      <table class="table table-hover attr-table">
+        <tr><th scope="row">{% trans "Scan profile" %}</th><td>{{ object.get_scan_profile_display }}</td></tr>
+        {% if object.scan_profile == 'custom' %}
+          <tr><th scope="row">{% trans "nmap arguments" %}</th><td><code>{{ object.custom_nmap_args }}</code></td></tr>
+        {% endif %}
+        <tr><th scope="row">{% trans "SNMP polling" %}</th><td>{% checkmark object.snmp_enabled %}</td></tr>
+        <tr><th scope="row">{% trans "SSH collection" %}</th><td>{% checkmark object.ssh_enabled %}</td></tr>
+        <tr><th scope="row">{% trans "LLDP/CDP neighbours" %}</th><td>{% checkmark object.collect_neighbors %}</td></tr>
+        <tr><th scope="row">{% trans "ARP harvesting" %}</th><td>{% checkmark object.collect_arp %}</td></tr>
+        <tr>
+          <th scope="row">{% trans "Credentials" %}</th>
+          <td>
+            {% for credential in object.credentials.all %}
+              <a href="{{ credential.get_absolute_url }}">{{ credential }}</a> {% badge credential.get_kind_display bg_color=credential.get_kind_color %}<br />
+            {% empty %}
+              <span class="text-warning">{% trans "None - only nmap data will be collected" %}</span>
+            {% endfor %}
+          </td>
+        </tr>
+      </table>
+    </div>
+    {% include 'inc/panels/tags.html' %}
+    {% plugin_left_page object %}
+  </div>
+  <div class="col col-12 col-md-6">
+    <div class="card">
+      <h2 class="card-header">{% trans "Status" %}</h2>
+      <table class="table table-hover attr-table">
+        <tr>
+          <th scope="row">{% trans "Last run" %}</th>
+          <td>
+            {% if last_job %}
+              <a href="{{ last_job.get_absolute_url }}">{{ last_job.completed|default:last_job.created|isodatetime }}</a>
+              {% badge last_job.get_status_display bg_color=last_job.get_status_color %}
+            {% else %}{{ ''|placeholder }}{% endif %}
+          </td>
+        </tr>
+        <tr><th scope="row">{% trans "Schedule" %}</th><td>{% if object.interval %}{% blocktrans with interval=object.interval %}Every {{ interval }} minutes{% endblocktrans %}{% if next_job %} ({% trans "next" %}: {{ next_job.scheduled|isodatetime }}){% endif %}{% else %}{% trans "Manual only" %}{% endif %}</td></tr>
+        <tr><th scope="row">{% trans "Discovered hosts" %}</th><td><a href="{% url 'plugins:netbox_nmap_discovery:discoveredhost_list' %}?scan_target_id={{ object.pk }}">{{ host_count }}</a> ({{ managed_count }} {% trans "answered SNMP/SSH" %}, {{ stale_count }} {% trans "stale" %})</td></tr>
+        <tr><th scope="row">{% trans "Pending review" %}</th><td><a href="{% url 'plugins:netbox_nmap_discovery:proposedchange_list' %}?scan_target_id={{ object.pk }}&status=pending">{{ pending_count }}</a></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2 class="card-header">{% trans "Defaults & Synchronisation" %}</h2>
+      <table class="table table-hover attr-table">
+        <tr><th scope="row">{% trans "Site" %}</th><td>{{ object.site|linkify|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "Location" %}</th><td>{{ object.location|linkify|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "Tenant" %}</th><td>{{ object.tenant|linkify|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "VRF" %}</th><td>{{ object.vrf|linkify|default:_("Global") }}</td></tr>
+        <tr><th scope="row">{% trans "Default role" %}</th><td>{{ object.default_role|linkify|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "Device status" %}</th><td>{{ object.get_device_status_display }}</td></tr>
+        <tr><th scope="row">{% trans "Sync mode" %}</th><td>{% badge object.get_sync_mode_display bg_color=object.get_sync_mode_color %}</td></tr>
+        <tr><th scope="row">{% trans "Stale after" %}</th><td>{{ object.stale_threshold }} {% trans "missed scans" %}{% if object.deprecate_stale_ips %} ({% trans "stale IPs are deprecated" %}){% endif %}</td></tr>
+      </table>
+    </div>
+    {% include 'inc/panels/custom_fields.html' %}
+    {% include 'inc/panels/comments.html' %}
+    {% plugin_right_page object %}
+  </div>
+</div>
+<div class="row">
+  <div class="col col-md-12">
+    <div class="card">
+      <h2 class="card-header">{% trans "Pending Review" %}
+        <div class="card-actions"><a href="{% url 'plugins:netbox_nmap_discovery:proposedchange_list' %}?scan_target_id={{ object.pk }}&status=pending" class="btn btn-ghost-primary btn-sm">{% trans "Open review queue" %}</a></div>
+      </h2>
+      <div class="table-responsive">{% render_table proposals_table 'inc/table.html' %}</div>
+    </div>
+    {% plugin_full_width_page object %}
+  </div>
+</div>
+{% endblock %}

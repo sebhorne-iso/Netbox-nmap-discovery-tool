@@ -1,0 +1,15 @@
+Port                           : 1/1/49
+Neighbor Entries               : 1
+Neighbor Entries Deleted       : 0
+Neighbor Chassis-Name          : sw-access-01
+Neighbor Chassis-Description   : Aruba JL659A 6300M 48SR5 CL6 PoE 4SFP56 Swch FL.10.10.1020
+Neighbor Chassis-ID            : 90:20:c2:00:00:01
+Neighbor Management-Address    : 10.0.0.12
+Chassis Capabilities Available : Bridge, Router
+Chassis Capabilities Enabled   : Bridge, Router
+Neighbor Port-ID               : 1/1/52
+Neighbor Port-Desc             : 1/1/52
+TTL                            : 120
+
+Port                           : 1/1/50
+Neighbor Entries               : 0

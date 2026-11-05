@@ -1,0 +1,3 @@
+# Install the plugin from GitHub (no git binary needed in the image). Pin a tag or commit for production, e.g.
+#   netbox-nmap-discovery @ https://github.com/sebhorne-iso/Netbox-nmap-discovery-tool/archive/refs/tags/v0.1.0.tar.gz
+netbox-nmap-discovery @ https://github.com/sebhorne-iso/Netbox-nmap-discovery-tool/archive/refs/heads/main.tar.gz
