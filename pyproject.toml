@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-nmap-discovery"
-version = "0.1.0"
+version = "0.1.1"
 description = "NetBox plugin that discovers network devices with nmap, SNMP and SSH and synchronises them into DCIM and IPAM."
 readme = "README.md"
 license = { text = "Apache-2.0" }

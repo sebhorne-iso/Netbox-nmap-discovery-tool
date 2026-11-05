@@ -13,14 +13,16 @@ class Migration(migrations.Migration):
 
     initial = True
 
+    # Depend on the latest NetBox migrations of the oldest supported release (v4.5.0), not on whatever release the
+    # migration was generated with, so the plugin installs on every NetBox version from min_version onwards.
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        ("core", "0026_populate_job_execution_time"),
-        ("dcim", "0251_fix_ltree_cascade_triggers"),
-        ("extras", "0145_taggeditem_object_id_bigint"),
-        ("ipam", "0097_merge_ipaddress_host_index_and_multi_protocol_services"),
-        ("tenancy", "0027_fix_ltree_cascade_triggers"),
-        ("users", "0016_default_ordering_indexes"),
+        ("core", "0020_owner"),
+        ("dcim", "0225_gfk_indexes"),
+        ("extras", "0134_owner"),
+        ("ipam", "0086_gfk_indexes"),
+        ("tenancy", "0022_add_comments_to_organizationalmodel"),
+        ("users", "0015_owner"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
