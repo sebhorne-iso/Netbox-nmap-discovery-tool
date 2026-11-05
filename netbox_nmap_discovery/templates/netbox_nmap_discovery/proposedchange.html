@@ -1,0 +1,109 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load i18n %}
+
+{% block extra_controls %}
+  {% if can_decide and perms.netbox_nmap_discovery.change_proposedchange %}
+    {% if is_device_proposal %}
+      <a href="{% url 'plugins:netbox_nmap_discovery:proposedchange_edit' pk=object.pk %}" class="btn btn-yellow">
+        <i class="mdi mdi-pencil" aria-hidden="true"></i> {% trans "Edit values" %}
+      </a>
+    {% endif %}
+    <form action="{% url 'plugins:netbox_nmap_discovery:proposedchange_approve' pk=object.pk %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-green"><i class="mdi mdi-check-bold" aria-hidden="true"></i> {% trans "Approve" %}</button>
+    </form>
+    <form action="{% url 'plugins:netbox_nmap_discovery:proposedchange_reject' pk=object.pk %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger"><i class="mdi mdi-close-thick" aria-hidden="true"></i> {% trans "Reject" %}</button>
+    </form>
+  {% endif %}
+{% endblock extra_controls %}
+
+{% block content %}
+{% if problems and can_decide %}
+  <div class="alert alert-warning" role="alert">
+    <i class="mdi mdi-alert" aria-hidden="true"></i>
+    {% for problem in problems %}{{ problem }}{% if not forloop.last %}<br />{% endif %}{% endfor %}
+  </div>
+{% endif %}
+{% if object.status == 'failed' %}
+  <div class="alert alert-danger" role="alert"><strong>{% trans "Failed" %}:</strong> {{ object.error }}</div>
+{% elif object.error %}
+  <div class="alert alert-info" role="alert">{{ object.error }}</div>
+{% endif %}
+<div class="row mb-3">
+  <div class="col col-12 col-md-5">
+    <div class="card">
+      <h2 class="card-header">{% trans "Proposed Change" %}</h2>
+      <table class="table table-hover attr-table">
+        <tr><th scope="row">{% trans "Summary" %}</th><td>{{ object.summary }}</td></tr>
+        <tr><th scope="row">{% trans "Kind" %}</th><td>{% badge object.get_kind_display bg_color=object.get_kind_color %}</td></tr>
+        <tr><th scope="row">{% trans "Status" %}</th><td>{% badge object.get_status_display bg_color=object.get_status_color %}</td></tr>
+        <tr><th scope="row">{% trans "Object" %}</th><td>{{ object.object|linkify|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "Scan target" %}</th><td>{{ object.scan_target|linkify|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "Discovered by job" %}</th><td>{% if object.job %}<a href="{{ object.job.get_absolute_url }}">{{ object.job }}</a>{% else %}{{ ''|placeholder }}{% endif %}</td></tr>
+        <tr><th scope="row">{% trans "Last refreshed" %}</th><td>{{ object.last_updated|isodatetime }}</td></tr>
+        <tr><th scope="row">{% trans "Decided by" %}</th><td>{{ object.decided_by|placeholder }}{% if object.decided_at %} ({{ object.decided_at|isodatetime }}){% endif %}</td></tr>
+      </table>
+    </div>
+    {% if object.overrides %}
+      <div class="card">
+        <h2 class="card-header">{% trans "Reviewer Overrides" %}</h2>
+        <table class="table table-hover attr-table">
+          {% for key, value in object.overrides.items %}
+            <tr><th scope="row">{{ key }}</th><td>{{ value }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endif %}
+    {% if host %}
+      <div class="card">
+        <h2 class="card-header">{% trans "Discovered Facts" %}</h2>
+        <table class="table table-hover attr-table">
+          <tr><th scope="row">{% trans "Address" %}</th><td>{{ host.address }}</td></tr>
+          <tr><th scope="row">{% trans "Collected via" %}</th><td>{{ host.methods|join:", "|default:"nmap" }}</td></tr>
+          {% if host.facts %}
+            <tr><th scope="row">{% trans "Hostname" %}</th><td>{{ host.facts.hostname|placeholder }}</td></tr>
+            <tr><th scope="row">{% trans "Vendor / model" %}</th><td>{{ host.facts.vendor|default:"?" }} {{ host.facts.model|default:"" }}</td></tr>
+            <tr><th scope="row">{% trans "Serial" %}</th><td>{{ host.facts.serial|placeholder }}</td></tr>
+            <tr><th scope="row">{% trans "Platform / OS" %}</th><td>{{ host.facts.platform|placeholder }} {{ host.facts.os_version|default:"" }}</td></tr>
+            <tr><th scope="row">{% trans "sysLocation" %}</th><td>{{ host.facts.sys_location|placeholder }}</td></tr>
+          {% endif %}
+          <tr><th scope="row">{% trans "Interfaces" %}</th><td>{{ host.interfaces|length }}</td></tr>
+          <tr><th scope="row">{% trans "Neighbours" %}</th><td>{{ host.neighbors|length }}</td></tr>
+        </table>
+      </div>
+    {% endif %}
+    {% include 'inc/panels/tags.html' %}
+  </div>
+  <div class="col col-12 col-md-7">
+    <div class="card">
+      <h2 class="card-header">{% trans "Changes" %} <span class="badge text-bg-secondary ms-1">{{ object.diff|length }}</span></h2>
+      <ul class="list-group list-group-flush">
+        {% for change in object.diff %}
+          <li class="list-group-item{% if change.sensitive %} list-group-item-warning{% endif %}">
+            {% if change.action == 'create' %}<i class="mdi mdi-plus-circle text-success" aria-hidden="true"></i>
+            {% elif change.action == 'update' %}<i class="mdi mdi-pencil-circle text-primary" aria-hidden="true"></i>
+            {% else %}<i class="mdi mdi-link-variant text-info" aria-hidden="true"></i>{% endif %}
+            {{ change.text }}
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">{% trans "No changes recorded" %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% if host and host.neighbors %}
+      <div class="card">
+        <h2 class="card-header">{% trans "LLDP / CDP Neighbours" %}</h2>
+        <table class="table table-hover">
+          <thead><tr><th>{% trans "Local" %}</th><th>{% trans "Protocol" %}</th><th>{% trans "Remote device" %}</th><th>{% trans "Remote port" %}</th><th>{% trans "Mgmt address" %}</th></tr></thead>
+          {% for n in host.neighbors %}
+            <tr><td>{{ n.local_interface }}</td><td>{{ n.protocol|upper }}</td><td>{{ n.remote_name|placeholder }}</td><td>{{ n.remote_interface|placeholder }}</td><td>{{ n.remote_mgmt_address|placeholder }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

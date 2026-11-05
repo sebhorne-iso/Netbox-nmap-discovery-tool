@@ -1,0 +1,93 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load i18n %}
+
+{% block extra_controls %}
+  {% if not object.device and perms.netbox_nmap_discovery.add_proposedchange %}
+    <form action="{% url 'plugins:netbox_nmap_discovery:discoveredhost_promote' pk=object.pk %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary"><i class="mdi mdi-server-plus" aria-hidden="true"></i> {% trans "Promote to device" %}</button>
+    </form>
+  {% endif %}
+  {% if perms.netbox_nmap_discovery.run_scantarget %}
+    <a href="{% url 'plugins:netbox_nmap_discovery:rediscover' %}?address={{ object.address }}&return_url={{ object.get_absolute_url }}" class="btn btn-cyan">
+      <i class="mdi mdi-refresh" aria-hidden="true"></i> {% trans "Rediscover" %}
+    </a>
+  {% endif %}
+{% endblock extra_controls %}
+
+{% block content %}
+<div class="row mb-3">
+  <div class="col col-12 col-md-6">
+    <div class="card">
+      <h2 class="card-header">{% trans "Discovered Host" %}</h2>
+      <table class="table table-hover attr-table">
+        <tr><th scope="row">{% trans "Address" %}</th><td>{{ object.address }}</td></tr>
+        <tr><th scope="row">{% trans "VRF" %}</th><td>{{ object.vrf|linkify|default:_("Global") }}</td></tr>
+        <tr><th scope="row">{% trans "Hostname" %}</th><td>{{ object.hostname|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "DNS name" %}</th><td>{{ object.dns_name|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "MAC address" %}</th><td>{{ object.mac_address|placeholder }} {% if object.mac_vendor %}<span class="text-muted">({{ object.mac_vendor }})</span>{% endif %}</td></tr>
+        <tr><th scope="row">{% trans "OS guess" %}</th><td>{{ object.os_guess|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "Platform" %}</th><td>{{ object.get_platform_display|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "Collected via" %}</th><td>{{ object.methods|join:", "|default:_("nmap only") }}</td></tr>
+        <tr><th scope="row">{% trans "Found by" %}</th><td>{{ object.get_source_display }}</td></tr>
+        <tr><th scope="row">{% trans "Device" %}</th><td>{{ object.device|linkify|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "IP address" %}</th><td>{{ object.ip_address|linkify|placeholder }}</td></tr>
+        <tr><th scope="row">{% trans "Scan target" %}</th><td>{{ object.scan_target|linkify|placeholder }}</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2 class="card-header">{% trans "History" %}</h2>
+      <table class="table table-hover attr-table">
+        <tr><th scope="row">{% trans "First seen" %}</th><td>{{ object.first_seen|isodatetime }}</td></tr>
+        <tr><th scope="row">{% trans "Last seen" %}</th><td>{{ object.last_seen|isodatetime }}</td></tr>
+        <tr><th scope="row">{% trans "Consecutive misses" %}</th><td>{{ object.miss_count }}</td></tr>
+        <tr><th scope="row">{% trans "Stale" %}</th><td>{% checkmark object.is_stale show_false=False %}{% if not object.is_stale %}{% trans "No" %}{% endif %}</td></tr>
+      </table>
+    </div>
+    {% if proposals %}
+      <div class="card">
+        <h2 class="card-header">{% trans "Proposals" %}</h2>
+        <ul class="list-group list-group-flush">
+          {% for p in proposals %}
+            <li class="list-group-item"><a href="{{ p.get_absolute_url }}">{{ p }}</a> {% badge p.get_status_display bg_color=p.get_status_color %}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+  <div class="col col-12 col-md-6">
+    <div class="card">
+      <h2 class="card-header">{% trans "Open Ports" %}</h2>
+      <table class="table table-hover">
+        <thead><tr><th>{% trans "Port" %}</th><th>{% trans "Service" %}</th><th>{% trans "Product" %}</th></tr></thead>
+        {% for port in object.open_ports %}
+          <tr><td>{{ port.port }}/{{ port.protocol }}</td><td>{{ port.service|placeholder }}</td><td>{{ port.product }} {{ port.version }}</td></tr>
+        {% empty %}
+          <tr><td colspan="3" class="text-muted">{% trans "No open ports recorded" %}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% if host and host.interfaces %}
+      <div class="card">
+        <h2 class="card-header">{% trans "Interfaces" %}</h2>
+        <table class="table table-hover">
+          <thead><tr><th>{% trans "Name" %}</th><th>{% trans "Type" %}</th><th>{% trans "MAC" %}</th><th>{% trans "Addresses" %}</th><th>{% trans "Up" %}</th></tr></thead>
+          {% for i in host.interfaces %}
+            <tr><td>{{ i.name }}</td><td>{{ i.type|placeholder }}</td><td>{{ i.mac_address|placeholder }}</td><td>{{ i.ip_addresses|join:", "|placeholder }}</td><td>{% checkmark i.oper_up %}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endif %}
+    {% if host and host.errors %}
+      <div class="card">
+        <h2 class="card-header">{% trans "Collection Errors" %}</h2>
+        <ul class="list-group list-group-flush">
+          {% for error in host.errors %}<li class="list-group-item small font-monospace">{{ error }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+    {% include 'inc/panels/tags.html' %}
+  </div>
+</div>
+{% endblock %}
