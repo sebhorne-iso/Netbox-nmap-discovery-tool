@@ -1,0 +1,27 @@
+# Copy into your netbox-docker checkout (next to docker-compose.yml) together with Dockerfile-Plugins,
+# plugin_requirements.txt and configuration/plugins.py.
+services:
+  netbox:
+    image: netbox-discovery:latest
+    pull_policy: never
+    build:
+      context: .
+      dockerfile: Dockerfile-Plugins
+    environment:
+      # 32+ random characters; generate with: openssl rand -base64 32
+      NETBOX_DISCOVERY_ENCRYPTION_KEY: ${NETBOX_DISCOVERY_ENCRYPTION_KEY:?set NETBOX_DISCOVERY_ENCRYPTION_KEY}
+
+  netbox-worker:
+    image: netbox-discovery:latest
+    pull_policy: never
+    # Scans run here: grant raw-socket capabilities for SYN scans / OS detection
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    environment:
+      NETBOX_DISCOVERY_ENCRYPTION_KEY: ${NETBOX_DISCOVERY_ENCRYPTION_KEY:?set NETBOX_DISCOVERY_ENCRYPTION_KEY}
+      NMAP_PRIVILEGED: "1"
+    # Optional: put the worker on the host network so nmap sees MAC addresses of hosts on directly attached
+    # segments (ARP) instead of scanning through Docker NAT. Postgres/Redis must then be reachable from the host
+    # (publish their ports and point DB_HOST / REDIS_HOST at 127.0.0.1 for this service).
+    # network_mode: host

@@ -1,0 +1,21 @@
+# NetBox image with nmap and the Network Discovery plugin, for netbox-community/netbox-docker.
+#
+#   docker compose build --no-cache && docker compose up -d
+#
+ARG NETBOX_IMAGE=docker.io/netboxcommunity/netbox:v4.7-5.1.1
+FROM ${NETBOX_IMAGE}
+
+# nmap plus file capabilities so the (non-root) worker can send raw packets for SYN scans and OS detection.
+# The container running nmap must be granted NET_RAW and NET_ADMIN (see docker-compose.override.yml): the kernel
+# refuses to execute a binary whose file capabilities are not all present in the container's bounding set.
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nmap libcap2-bin \
+    && setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY ./plugin_requirements.txt /opt/netbox/
+RUN /usr/local/bin/uv pip install -r /opt/netbox/plugin_requirements.txt
+
+# Collect plugin static files into the image
+RUN DEBUG="true" SECRET_KEY="dummyKeyWithMinimumLength-------------------------" \
+    /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py collectstatic --no-input
