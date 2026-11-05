@@ -1,0 +1,17 @@
+Version: FortiGate-60F v7.2.5,build1517,230606 (GA.F)
+Firmware Signature: certified
+Virus-DB: 91.03940(2023-06-08 17:31)
+Serial-Number: FGT60FTK21000001
+BIOS version: 05000029
+System Part-Number: P24302-04
+Log hard disk: Not available
+Hostname: FGT-HQ
+Private Encryption: Disable
+Operation Mode: NAT
+Current virtual domain: root
+Max number of virtual domains: 10
+Virtual domains status: 1 in NAT mode, 0 in TP mode
+Virtual domain configuration: disable
+FIPS-CC mode: disable
+Current HA mode: standalone
+System time: Mon Nov  4 10:00:00 2024

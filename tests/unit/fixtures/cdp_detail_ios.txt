@@ -1,0 +1,26 @@
+-------------------------
+Device ID: sw2.example.com
+Entry address(es): 
+  IP address: 10.0.0.2
+Platform: cisco C9300-48P,  Capabilities: Switch IGMP 
+Interface: GigabitEthernet1/0/1,  Port ID (outgoing port): GigabitEthernet1/0/49
+Holdtime : 163 sec
+
+Version :
+Cisco IOS Software [Cupertino], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 17.9.4
+
+advertisement version: 2
+Native VLAN: 1
+Duplex: full
+Management address(es): 
+  IP address: 192.168.0.2
+
+-------------------------
+Device ID: AP01
+Entry address(es): 
+  IP address: 10.0.0.30
+Platform: cisco AIR-AP3802I-B-K9,  Capabilities: Trans-Bridge Source-Route-Bridge IGMP 
+Interface: GigabitEthernet1/0/10,  Port ID (outgoing port): GigabitEthernet0
+Holdtime : 120 sec
+
+Total cdp entries displayed : 2

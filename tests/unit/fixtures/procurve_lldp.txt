@@ -1,0 +1,18 @@
+
+ LLDP Remote Device Information Detail
+
+  Local Port   : 49
+  ChassisType  : mac-address
+  ChassisId    : 90 20 c2 00 00 01
+  PortType     : local
+  PortId       : 1/1/1
+  SysName      : sw-core-01
+  System Descr : Aruba JL658A 6300M FL.10.10.1020
+  PortDescr    : 1/1/1
+
+  System Capabilities Supported  : bridge, router
+  System Capabilities Enabled    : bridge, router
+
+  Remote Management Address
+     Type    : ipv4
+     Address : 10.0.0.11

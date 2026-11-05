@@ -1,0 +1,16 @@
+
+ Status and Counters - General System Information
+
+  System Name        : HP-2530-48G
+  System Contact     :
+  System Location    : Closet 2
+
+  MAC Age Time (sec) : 300
+
+  Time Zone          : 0
+  Daylight Time Rule : None
+
+  Software revision  : YA.16.10.0012        Base MAC Addr      : 9cdc71-000001
+  ROM Version        : YA.15.20             Serial Number      : CN6BFP0001
+
+  Up Time            : 23 days              Memory   - Total   : 152,154,112

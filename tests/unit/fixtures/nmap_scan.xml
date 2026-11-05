@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sS --top-ports 100 -O -oX - 10.0.0.0/29" start="1730800000" version="7.94" xmloutputversion="1.05">
+<scaninfo type="syn" protocol="tcp" numservices="100" services="7,9,13,21-23,25-26,37,53,79-81,88,106,110-111,113,119,135,139,143-144,179,199,389,427,443-445,465,513-515,543-544,548,554,587,631,646,873,990,993,995,1025-1029,1110,1433,1720,1723,1755,1900,2000-2001,2049,2121,2717,3000,3128,3306,3389,3986,4899,5000,5009,5051,5060,5101,5190,5357,5432,5631,5666,5800,5900,6000-6001,6646,7070,8000,8008-8009,8080-8081,8443,8888,9100,9999-10000,32768,49152-49157"/>
+<host starttime="1730800001" endtime="1730800010"><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="10.0.0.1" addrtype="ipv4"/>
+<address addr="00:11:22:33:44:01" addrtype="mac" vendor="Cisco Systems"/>
+<hostnames><hostname name="sw1.example.com" type="PTR"/></hostnames>
+<ports><extraports state="closed" count="97"/>
+<port protocol="tcp" portid="22"><state state="open" reason="syn-ack" reason_ttl="255"/><service name="ssh" product="Cisco SSH" version="1.25" method="probed" conf="10"/></port>
+<port protocol="tcp" portid="23"><state state="filtered" reason="no-response" reason_ttl="0"/><service name="telnet" method="table" conf="3"/></port>
+<port protocol="tcp" portid="443"><state state="open" reason="syn-ack" reason_ttl="255"/><service name="https" method="table" conf="3"/></port>
+</ports>
+<os><osmatch name="Cisco IOS 15.2" accuracy="92" line="1"><osclass type="switch" vendor="Cisco" osfamily="IOS" osgen="15.X" accuracy="92"/></osmatch>
+<osmatch name="Cisco IOS XE 16.x" accuracy="98" line="2"><osclass type="switch" vendor="Cisco" osfamily="IOS XE" osgen="16.X" accuracy="98"/></osmatch></os>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="10.0.0.5" addrtype="ipv4"/>
+<address addr="AA:BB:CC:00:00:05" addrtype="mac" vendor="Hewlett Packard"/>
+<hostnames><hostname name="printer1" type="user"/><hostname name="printer1.example.com" type="PTR"/></hostnames>
+<ports><port protocol="tcp" portid="9100"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="jetdirect" method="table" conf="3"/></port></ports>
+</host>
+<host><status state="down" reason="no-response" reason_ttl="0"/><address addr="10.0.0.6" addrtype="ipv4"/></host>
+<runstats><finished time="1730800020" elapsed="20.0" exit="success"/><hosts up="2" down="6" total="8"/></runstats>
+</nmaprun>

@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netbox-nmap-discovery"
+version = "0.1.0"
+description = "NetBox plugin that discovers network devices with nmap, SNMP and SSH and synchronises them into DCIM and IPAM."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.12"
+authors = [{ name = "sebhorne-iso" }]
+keywords = ["netbox", "netbox-plugin", "nmap", "snmp", "napalm", "discovery"]
+classifiers = [
+    "Framework :: Django",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Networking",
+]
+dependencies = [
+    "cryptography>=42.0",
+    "defusedxml>=0.7",
+    "pysnmp>=7.1,<8",
+    "napalm>=5.0",
+    "netmiko>=4.3",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.urls]
+Homepage = "https://github.com/sebhorne-iso/Netbox-nmap-discovery-tool"
+
+[tool.setuptools.packages.find]
+include = ["netbox_nmap_discovery*"]
+
+[tool.setuptools.package-data]
+netbox_nmap_discovery = ["templates/**/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = ["B904", "B008"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["netbox", "dcim", "ipam", "core", "extras", "tenancy", "users", "utilities"]
+
+[tool.ruff.lint.per-file-ignores]
+"netbox_nmap_discovery/migrations/*" = ["E501"]
