@@ -51,6 +51,15 @@ ENCRYPTED_FIELDS = (
 )
 
 
+def _owner_field():
+    """
+    PrimaryModel.owner, declared explicitly on plugin models. NetBox 4.7 added related_name="+" to this inherited
+    field (4.5 and 4.6 have none), so inheriting it would make the model state, and therefore the migrations, differ
+    between supported NetBox releases. Pinning the 4.7 definition keeps it identical everywhere.
+    """
+    return models.ForeignKey(to="users.Owner", on_delete=models.PROTECT, related_name="+", blank=True, null=True)
+
+
 def _encrypted_property(field_name):
     def getter(self):
         return crypto.decrypt(getattr(self, field_name))
@@ -64,6 +73,7 @@ def _encrypted_property(field_name):
 class CredentialProfile(PrimaryModel):
     """An SNMP community / SNMPv3 user or an SSH login, stored encrypted."""
 
+    owner = _owner_field()
     name = models.CharField(verbose_name=_("name"), max_length=100, unique=True)
     kind = models.CharField(verbose_name=_("kind"), max_length=20, choices=CredentialKindChoices)
     priority = models.PositiveSmallIntegerField(
@@ -170,6 +180,7 @@ class CredentialProfile(PrimaryModel):
 class ScanTarget(JobsMixin, PrimaryModel):
     """A set of networks to scan, with the defaults used for anything discovered in them."""
 
+    owner = _owner_field()
     name = models.CharField(verbose_name=_("name"), max_length=100, unique=True)
     enabled = models.BooleanField(verbose_name=_("enabled"), default=True)
     targets = models.TextField(
